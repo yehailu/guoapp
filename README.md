@@ -4,7 +4,7 @@ Flutter 多端独立短剧 / 影视应用，手机、平板、电脑和电视分
 
 本项目改编自 [fish2018](https://github.com/fish2018) 的源码。
 
-Telegram：[交流群组](https://t.me/+c9YKHp7FjSk0MjI1) · [更新频道](https://t.me/+F9NnQSsMfOU3OTdl)
+Telegram：[交流群组](没有) · [更新频道](没有)
 
 - **红果鉴**：只含红果站源。
 - **真果鉴**：含全部站源，可在设置里逐个开关。

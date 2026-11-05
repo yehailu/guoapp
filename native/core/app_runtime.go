@@ -173,8 +173,6 @@ type nativeEngine struct {
 	playbackCancel   context.CancelFunc
 	sourceCatalogMu  sync.Mutex
 	sourceCatalogs   map[string]chan struct{}
-	updateMu         sync.Mutex
-	updateJob        *nativeUpdateJob
 }
 
 var nativeState struct {
@@ -378,6 +376,8 @@ func nativeDispatch(input nativeInput) (any, error) {
 		return engine.nativeRecommendations(ctx, input)
 	case "cachedRecommendations":
 		return engine.cachedRecommendations(input.Category)
+	case "hongguoDevices":
+		return engine.hongguoDevices(ctx, input.Command == "register")
 	case "rankingBoards":
 		boards := []rankingBoard{}
 		for _, board := range rankingBoards {
@@ -458,8 +458,6 @@ func nativeDispatch(input nativeInput) (any, error) {
 		return engine.checkUpdate(ctx, input.Version)
 	case "reportUsage":
 		return true, engine.reportUsage(ctx, input.Version)
-	case "updateDownload":
-		return engine.updateDownload(input)
 	default:
 		return nil, errors.New("不支持的应用操作")
 	}
@@ -538,6 +536,17 @@ func (engine *nativeEngine) nativeCatalog(ctx context.Context, input nativeInput
 	}
 	if query != "" && source == sourceGuipian {
 		items, more, err := d.fetchGuipianCatalogPage(ctx, page, "", query)
+		if err != nil {
+			return result, err
+		}
+		for _, drama := range items {
+			result.Items = append(result.Items, nativeNormalize(drama))
+		}
+		result.HasMore = more
+		return result, nil
+	}
+	if query != "" && source == sourceHuangguoAI {
+		items, more, err := d.searchHuangguoAI(ctx, page, query)
 		if err != nil {
 			return result, err
 		}

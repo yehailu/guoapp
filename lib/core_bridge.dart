@@ -155,10 +155,7 @@ abstract class AppRepository {
   }) => resolve(drama, episode, quality: quality);
   Future<AppUpdate?> checkUpdate(String version) async => null;
   Future<void> reportUsage(String version) async {}
-  Future<void> startUpdateDownload(String version, String directory) async {}
-  Future<UpdateDownload> updateDownloadStatus() async =>
-      const UpdateDownload(error: '当前版本不支持应用内更新');
-  Future<void> cancelUpdateDownload() async {}
+  Future<bool> hongguoDevices({bool register = false}) async => true;
   Future<void> initialize();
   Future<CatalogPage> catalog(
     String source, {
@@ -458,33 +455,12 @@ class NativeRepository extends AppRepository {
   }
 
   @override
-  Future<void> startUpdateDownload(String version, String directory) async {
-    await _call({
-      'action': 'updateDownload',
-      'command': 'start',
-      'version': version,
-      'directory': directory,
-    });
-  }
-
-  @override
-  Future<UpdateDownload> updateDownloadStatus() async {
-    final result = await _call({
-      'action': 'updateDownload',
-      'command': 'status',
-    });
-    return UpdateDownload(
-      received: intValue(result['received']),
-      total: intValue(result['total']),
-      path: result['path'] as String? ?? '',
-      error: result['error'] as String? ?? '',
-    );
-  }
-
-  @override
-  Future<void> cancelUpdateDownload() async {
-    await _call({'action': 'updateDownload', 'command': 'cancel'});
-  }
+  Future<bool> hongguoDevices({bool register = false}) async =>
+      (await _call({
+        'action': 'hongguoDevices',
+        if (register) 'command': 'register',
+      }))['ready'] ==
+      true;
 
   Future<Map<String, dynamic>> _call(Map<String, dynamic> input) async {
     try {
